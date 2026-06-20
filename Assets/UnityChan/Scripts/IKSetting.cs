@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Numerics;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
@@ -21,9 +19,9 @@ public class IKSetting : MonoBehaviour
     Vector3[] NormalizeBone = new Vector3[12];
     float[] BoneDistance = new float[12];
     float Timer;
-    int[, ] joints = new int[, ] { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 4 }, { 4, 5 }, { 5, 6 }, { 0, 7 }, { 7, 8 }, { 8, 9 }, { 9, 10 }, { 8, 11 }, { 11, 12 }, { 12, 13 }, { 8, 14 }, { 14, 15 }, { 15, 16 } };
-    int[, ] BoneJoint = new int[, ] { { 0, 2 }, { 2, 3 }, { 0, 5 }, { 5, 6 }, { 0, 9 }, { 9, 10 }, { 9, 11 }, { 11, 12 }, { 12, 13 }, { 9, 14 }, { 14, 15 }, { 15, 16 } };
-    int[, ] NormalizeJoint = new int[, ] { { 0, 1 }, { 1, 2 }, { 0, 3 }, { 3, 4 }, { 0, 5 }, { 5, 6 }, { 5, 7 }, { 7, 8 }, { 8, 9 }, { 5, 10 }, { 10, 11 }, { 11, 12 } };
+    int[,] joints = new int[,] { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 4 }, { 4, 5 }, { 5, 6 }, { 0, 7 }, { 7, 8 }, { 8, 9 }, { 9, 10 }, { 8, 11 }, { 11, 12 }, { 12, 13 }, { 8, 14 }, { 14, 15 }, { 15, 16 } };
+    int[,] BoneJoint = new int[,] { { 0, 2 }, { 2, 3 }, { 0, 5 }, { 5, 6 }, { 0, 9 }, { 9, 10 }, { 9, 11 }, { 11, 12 }, { 12, 13 }, { 9, 14 }, { 14, 15 }, { 15, 16 } };
+    int[,] NormalizeJoint = new int[,] { { 0, 1 }, { 1, 2 }, { 0, 3 }, { 3, 4 }, { 0, 5 }, { 5, 6 }, { 5, 7 }, { 7, 8 }, { 8, 9 }, { 5, 10 }, { 10, 11 }, { 11, 12 } };
     int NowFrame = 0;
     void Start()
     {
@@ -92,10 +90,10 @@ public class IKSetting : MonoBehaviour
     {
         if (Math.Abs(points[0].x) < 1000 && Math.Abs(points[0].y) < 1000 && Math.Abs(points[0].z) < 1000)
         {
-           // BoneList[0].position = Vector3.Lerp(BoneList[0].position, points[0] * 0.001f + Vector3.up * 0.8f, 0.1f); 
-           // FullbodyIK.transform.position = Vector3.Lerp(FullbodyIK.transform.position, points[0] * 0.001f, 0.01f); 
+            // BoneList[0].position = Vector3.Lerp(BoneList[0].position, points[0] * 0.001f + Vector3.up * 0.8f, 0.1f); 
+            // FullbodyIK.transform.position = Vector3.Lerp(FullbodyIK.transform.position, points[0] * 0.001f, 0.01f); 
             BoneList[0].position = Vector3.Lerp(BoneList[0].position, points[0] + Vector3.up * 0.8f, 0.1f); //骨骼髋节点的位置
-            FullbodyIK.transform.position = Vector3.Lerp(FullbodyIK.transform.position, points[0] , 0.01f); //全身骨架的根节点位置
+            FullbodyIK.transform.position = Vector3.Lerp(FullbodyIK.transform.position, points[0], 0.01f); //全身骨架的根节点位置
             Vector3 hipRot = (NormalizeBone[0] + NormalizeBone[2] + NormalizeBone[4]).normalized; //计算实时髋节点的方向
             FullbodyIK.transform.forward = Vector3.Lerp(FullbodyIK.transform.forward, new Vector3(hipRot.x, 0, hipRot.z), 0.1f); // 整体骨架的Z轴方向
         }
@@ -113,10 +111,10 @@ public class IKSetting : MonoBehaviour
         //BoneList[13].position = Vector3.Lerp(BoneList[13].position,Vector3.up,0.1f);
         //BoneList[14].transform.position = Vector3.Lerp(BoneList[14].position,BoneList[9].position + Vector3.forward ,0.1f);
         // 画原数据位置
-       for (int i = 0; i < joints.Length / 2 ; i++)
-       {
-           DrawLine(points[joints[i, 0]] * 0.001f + new Vector3(-1, 0.8f, 0), points[joints[i, 1]] * 0.001f + new Vector3(-1, 0.8f, 0), Color.blue);
-       }
+        for (int i = 0; i < joints.Length / 2; i++)
+        {
+            DrawLine(points[joints[i, 0]] * 0.001f + new Vector3(-1, 0.8f, 0), points[joints[i, 1]] * 0.001f + new Vector3(-1, 0.8f, 0), Color.blue);
+        }
     }
     // 画12根骨架位置
     void DrawLine(Vector3 s, Vector3 e, Color c)
@@ -141,7 +139,7 @@ enum OpenPoseRef
     RightArm,
     RightElbow,
     RightWrist,
-    
+
     //Thumb,
     //Index,
 };
