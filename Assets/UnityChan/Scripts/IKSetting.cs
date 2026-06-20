@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 using Vector3 = UnityEngine.Vector3;
 
@@ -9,6 +7,7 @@ using Vector3 = UnityEngine.Vector3;
 public class IKSetting : MonoBehaviour
 {
     [SerializeField, Range(10, 120)] float FrameRate;
+    [SerializeField] private H36M_UDPReciever udpReciever;
     public List<Transform> BoneList = new List<Transform>();
     [SerializeField] string Data_Path;
     [SerializeField] string File_Name;
@@ -46,26 +45,13 @@ public class IKSetting : MonoBehaviour
     }
     void PointUpdate()
     {
-        StreamReader fi = null;
-        if (NowFrame < Data_Size)
+        if (!udpReciever.HasReceivedData()) return;
+        points = udpReciever.GetLatestPositions();
+        for (int i = 0; i < 12; i++)
         {
-            fi = new StreamReader(Application.dataPath + Data_Path + File_Name + NowFrame.ToString() + ".txt");
-            //NowFrame++;
-            string all = fi.ReadToEnd();
-            string[] axis = all.Split(']');
-            float[] x = axis[0].Replace("[", "").Replace(Environment.NewLine, "").Split(' ').Where(s => s != "").Select(f => float.Parse(f)).ToArray();
-            float[] y = axis[2].Replace("[", "").Replace(Environment.NewLine, "").Split(' ').Where(s => s != "").Select(f => float.Parse(f)).ToArray();
-            float[] z = axis[1].Replace("[", "").Replace(Environment.NewLine, "").Split(' ').Where(s => s != "").Select(f => float.Parse(f)).ToArray();
-            for (int i = 0; i < 17; i++)
-            {
-                points[i] = new Vector3(x[i], y[i], -z[i]);
-            }
-
-            for (int i = 0; i < 12; i++)
-            {
-                NormalizeBone[i] = (points[BoneJoint[i, 1]] - points[BoneJoint[i, 0]]).normalized;
-            }
+            NormalizeBone[i] = (points[BoneJoint[i, 1]] - points[BoneJoint[i, 0]]).normalized;
         }
+
     }
     void IKFind()
     {
