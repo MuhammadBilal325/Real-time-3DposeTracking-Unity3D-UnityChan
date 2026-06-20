@@ -8,16 +8,14 @@ public class IKSetting : MonoBehaviour
 {
     [SerializeField, Range(10, 120)] float FrameRate;
     [SerializeField] private H36M_UDPReciever udpReciever;
+    [SerializeField] private float scaleFactor = 1f;
     public List<Transform> BoneList = new List<Transform>();
-    [SerializeField] string Data_Path;
-    [SerializeField] string File_Name;
-    [SerializeField] int Data_Size;
     GameObject FullbodyIK;
     private GameObject leftthumb;
     Vector3[] points = new Vector3[17];
     Vector3[] NormalizeBone = new Vector3[12];
     float[] BoneDistance = new float[12];
-    float Timer;
+    float Timer = 0f;
     int[,] joints = new int[,] { { 0, 1 }, { 1, 2 }, { 2, 3 }, { 0, 4 }, { 4, 5 }, { 5, 6 }, { 0, 7 }, { 7, 8 }, { 8, 9 }, { 9, 10 }, { 8, 11 }, { 11, 12 }, { 12, 13 }, { 8, 14 }, { 14, 15 }, { 15, 16 } };
     int[,] BoneJoint = new int[,] { { 0, 2 }, { 2, 3 }, { 0, 5 }, { 5, 6 }, { 0, 9 }, { 9, 10 }, { 9, 11 }, { 11, 12 }, { 12, 13 }, { 9, 14 }, { 14, 15 }, { 15, 16 } };
     int[,] NormalizeJoint = new int[,] { { 0, 1 }, { 1, 2 }, { 0, 3 }, { 3, 4 }, { 0, 5 }, { 5, 6 }, { 5, 7 }, { 7, 8 }, { 8, 9 }, { 5, 10 }, { 10, 11 }, { 11, 12 } };
@@ -45,8 +43,16 @@ public class IKSetting : MonoBehaviour
     }
     void PointUpdate()
     {
+        print("Entering PointUpdate");
         if (!udpReciever.HasReceivedData()) return;
+        print("Updated points:");
         points = udpReciever.GetLatestPositions();
+        points = Array.ConvertAll(points, p => p * scaleFactor); // Scale the points by the specified factor
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            Debug.Log($"Point {i}: {points[i]}");
+        }
         for (int i = 0; i < 12; i++)
         {
             NormalizeBone[i] = (points[BoneJoint[i, 1]] - points[BoneJoint[i, 0]]).normalized;
@@ -83,7 +89,7 @@ public class IKSetting : MonoBehaviour
             Vector3 hipRot = (NormalizeBone[0] + NormalizeBone[2] + NormalizeBone[4]).normalized; //计算实时髋节点的方向
             FullbodyIK.transform.forward = Vector3.Lerp(FullbodyIK.transform.forward, new Vector3(hipRot.x, 0, hipRot.z), 0.1f); // 整体骨架的Z轴方向
         }
-        // 更新12个骨骼关键点的位置
+        //Update the positions of the 12 bone key points
         for (int i = 0; i < 12; i++)
         {
             BoneList[NormalizeJoint[i, 1]].position = Vector3.Lerp(
@@ -92,17 +98,17 @@ public class IKSetting : MonoBehaviour
             );
             DrawLine(BoneList[NormalizeJoint[i, 0]].position + Vector3.right, BoneList[NormalizeJoint[i, 1]].position + Vector3.right, Color.red);
         }
-        // 更新手部关键点位置
+        // Update hand key point positions
         //leftthumb = GameObject.Find("Thumb");
         //BoneList[13].position = Vector3.Lerp(BoneList[13].position,Vector3.up,0.1f);
         //BoneList[14].transform.position = Vector3.Lerp(BoneList[14].position,BoneList[9].position + Vector3.forward ,0.1f);
-        // 画原数据位置
+        // Draw the original data positions
         for (int i = 0; i < joints.Length / 2; i++)
         {
             DrawLine(points[joints[i, 0]] * 0.001f + new Vector3(-1, 0.8f, 0), points[joints[i, 1]] * 0.001f + new Vector3(-1, 0.8f, 0), Color.blue);
         }
     }
-    // 画12根骨架位置
+    // Draw the positions of the 12 bones
     void DrawLine(Vector3 s, Vector3 e, Color c)
     {
         Debug.DrawLine(s, e, c);
